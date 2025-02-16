@@ -2,9 +2,10 @@ const mongoose = require('mongoose');
 const express = require('express');
 const app = express();
 const path = require('path');
+require('dotenv').config();
 const cors = require('cors');
 const nodemailer = require("nodemailer");
-
+const PORT = process.env.PORT || 3000;
 // Middlewares
 app.use(express.json());
 app.use(cors());
@@ -15,7 +16,7 @@ app.get('/', (req, res) => {
 });
 
 // MongoDB Connection
-mongoose.connect('mongodb+srv://englishdocumentry1:KvDsgkWkjNBWPdml@clustertest.0i26y.mongodb.net/?retryWrites=true&w=majority&appName=Clustertest', {
+mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
@@ -46,8 +47,8 @@ const transporter = nodemailer.createTransport({
     port: 587,
     secure: false,
     auth: {
-        user: "prashant2107pd@gmail.com",
-        pass: "mfaqulkbpenspwyq",  // Ensure this is an App Password
+        user: EMAIL_USER,
+        pass: EMAIL_PASS,  // Ensure this is an App Password
     },
 });
 
@@ -103,6 +104,6 @@ app.post('/login', async (req, res) => {
 });
 
 // Start Server
-app.listen(3000, () => {
+app.listen(PORT, () => {
     console.log("Server is running on port 3000");
 });
