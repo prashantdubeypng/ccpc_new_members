@@ -76,7 +76,6 @@ async function sendEmail(email , name) {
                 "If you have any questions, feel free to reach out. We’re excited to see your work!\n" +
                 "\n" +
                 "Best Regards,\n" +
-                "[Your Name]\n" +
                 "Code Crafters Programming Club",
             // html: "<b>Welcome to our platform!</b>",
         });
