@@ -2,17 +2,17 @@ const mongoose = require('mongoose');
 const express = require('express');
 const app = express();
 const path = require('path');
+const nodemailer = require('nodemailer');
 require('dotenv').config();
 console.log("EMAIL_USER:", process.env.EMAIL_USER);
 console.log("EMAIL_PASS:", process.env.EMAIL_PASS);
 const cors = require('cors');
-const nodemailer = require("nodemailer");
 const PORT = process.env.PORT || 3000;
 // Middlewares
 app.use(express.json());
 app.use(cors());
 app.use(express.static(path.join(__dirname)));
-
+//during deploy we have remove that one because it renders the file when open on browser
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -39,6 +39,7 @@ const userSchema = mongoose.Schema({
     Batch: { type: String, required: true }
 });
 const User = mongoose.model('User', userSchema);
+
 // Email Transporter Setup
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
@@ -50,14 +51,34 @@ const transporter = nodemailer.createTransport({
     },
 });
 // Email Sending Function
-async function sendEmail(email) {
+async function sendEmail(email , name) {
     try {
         let info = await transporter.sendMail({
-            from: '"Prashant Dubey 👻" <prashant2107pd@gmail.com>',
+            from: '" Code Crafters Programming Club" <dev.ccpc@gmail.com>',
             to: email,
-            subject: "Welcome!",
-            text: "Thank you for registering!",
-            html: "<b>Welcome to our platform!</b>",
+            subject: "Next Steps for Your Code Crafters Programming Club Registration",
+            text: `Dear ${name},\n` +
+                "\n" +
+                "Thank you for registering for the Code Crafters Programming Club! We’re thrilled to have you take the next step in joining our community of passionate coders.\n" +
+                "\n" +
+                "To evaluate your skills and approach, we have assigned a task for you. Please find the task details in the document linked below:\n" +
+                "\n" +
+               ` "📌 Task Document:https://docs.google.com/document/d/1jUdkuXKYLQf1zCbwS0CzkaRxxbeb2RqNBUeKYI4Fvn8/edit?usp=sharing\n"` +
+                "\n" +
+                "Submission Guidelines:\n" +
+                "✅ Complete the given task within the specified timeline.\n" +
+                "✅ Upload your solution file and provide the GitHub repository link in the response form.\n" +
+                "\n" +
+                `📌 Response Form:https://forms.gle/UbESfaUvxLCADXEj6\n` +
+                "\n" +
+                "Shortlisted candidates will be invited for an interview based on their submissions. This is not just a test but an opportunity to showcase your problem-solving abilities and coding style.\n" +
+                "\n" +
+                "If you have any questions, feel free to reach out. We’re excited to see your work!\n" +
+                "\n" +
+                "Best Regards,\n" +
+                "[Your Name]\n" +
+                "Code Crafters Programming Club",
+            // html: "<b>Welcome to our platform!</b>",
         });
         console.log("Message sent: %s", info.messageId);
         return true;
@@ -82,9 +103,8 @@ app.post('/login', async (req, res) => {
         // Create new user
         const newUser = new User({ name, email, password, phone, PreferedLanguage, Skills, reg_no, Batch });
         await newUser.save();
-
         // Send email
-        const emailSent = await sendEmail(email);
+        const emailSent = await sendEmail(email,name);
         if (!emailSent) {
             return res.status(500).json({ message: 'User registered but email failed to send' });
         }
@@ -98,3 +118,4 @@ app.post('/login', async (req, res) => {
 app.listen(PORT, () => {
     console.log("Server is running on port 3000");
 });
+
